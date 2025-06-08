@@ -1,0 +1,138 @@
+package com.cornstr.loggps.ui
+
+
+import android.util.Log
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.cornstr.loggps.data.repository.auth_Credential
+import com.cornstr.loggps.data.remote.logGpsService
+import com.cornstr.loggps.data.repository.localRepository
+import com.cornstr.loggps.data.repository.login
+import com.cornstr.loggps.data.repository.signup_credential
+import com.cornstr.loggps.ui.navigation.Screen
+import kotlinx.coroutines.launch
+import java.lang.Exception
+import com.cornstr.loggps.data.repository.remoteRepository
+
+
+var Token : String = ""
+
+
+
+
+class APIViewModel : ViewModel() {
+
+    //TODO VAL FOR BELOW
+    private val _ApiResponse = mutableStateOf(login())
+    val ApiResponse : State<login> = _ApiResponse
+
+    //TODO FUNCTION FETCH API TO GET HOME SCREEN DETAILS
+    fun fetchApi(data: String,remoteRepository: remoteRepository){
+        remoteRepository.login(data)
+        _ApiResponse.value = _ApiResponse.value.copy(
+            loading = false,
+            response = remoteRepository.login.value.toString(),
+            status_Auth = remoteRepository.login.toString(),
+            error = "n"
+        )
+        Log.d("kya hua faatti","${_ApiResponse.value}")
+
+
+
+//        viewModelScope.launch {
+//            try {
+//                val data = logGpsService.login(data)  // TODO USER DATA'S TABLE
+//                _ApiResponse.value = _ApiResponse.value.copy(
+//                    loading = false,
+//                    response = data.message,
+//                    status_Auth = data.status,
+//                    error = null
+//                )
+//
+//            }catch (e: Exception){
+//                Log.d("logError here ","$e")
+//
+//            }
+//        }
+    }
+
+    //TODO UPAR WALE FUNCTION KA DATA CLASS HAI
+    data class ApiData(
+        val loading : Boolean = true,
+        val response: String = "",
+        val status_Auth : String = "",
+        val error : String?=null
+    )
+
+    //TODO VAL FOR BELOW
+    private val _TokenStatus = mutableStateOf(TokenData())
+    val TokenStatus : State<TokenData> = _TokenStatus
+
+    //TODO THIS FUNCTION IS TO GET THE JWT TOKENS
+    fun getAutheticaion(data: auth_Credential){
+        viewModelScope.launch {
+            //AGAR SERVER NE KOI BHI EXCEPTION DI TO NA RETROFIT SEEDHA EXCEPTION UTHA DETA HAI , ISI WJAH SE AGAR TOKEN NAHI AARA TO CATCH ME JARA HAI
+            try {
+                val status_Auth = logGpsService.userAtuhentication(data)
+                Token = status_Auth.access
+                fetchApi(Token, remoteRepository())
+                Log.e("Tokens auth ","$status_Auth")
+            }catch(e:kotlin.Exception){
+                Log.d("exception status auth ", "$e")
+                _TokenStatus.value = _TokenStatus.value.copy(
+                    TokenStatus = "failed",
+                    error = "$e"
+                )
+
+            }
+        }
+    }
+
+    //TODO UPAR WALE FUNCTION KA DATA CLASS HAI
+    data class TokenData(
+        val TokenStatus : String = "",
+        val error : String = ""
+    )
+
+    private val _SignUpApiResponse = mutableStateOf(signUpResponse())
+    val SignUpResponse : State<signUpResponse> = _SignUpApiResponse
+    fun signUp(data : signup_credential){
+        viewModelScope.launch {
+            try {
+                val response = logGpsService.signUp(data)
+                _SignUpApiResponse.value = _SignUpApiResponse.value.copy(
+                    loading = false,
+                    error = response.error,
+                    response = response.status
+                )
+            }catch (e:kotlin.Exception){
+                _SignUpApiResponse.value = _SignUpApiResponse.value.copy(
+                    loading = false,
+                    error = "$e",
+                    response = ""
+                )
+            }
+        }
+    }
+
+    //TODO YE UPAR WALE FUNCTION KA DATA CLASS HAI
+    data class signUpResponse(
+        val loading : Boolean = true,
+        val error : String = "",
+        val response : String = ""
+    )
+}
+
+
+class UIViewModel : ViewModel(){
+    private val _currentScreen : MutableState<Screen> = mutableStateOf(Screen.Pages.Home_Page)
+    val currentScreen : MutableState<Screen>
+        get() =_currentScreen
+    fun setCurrentScreen(screen: Screen){
+        _currentScreen.value = screen
+    }
+
+}
