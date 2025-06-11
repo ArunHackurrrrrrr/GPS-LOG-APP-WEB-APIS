@@ -5,9 +5,16 @@ def get_user_details(user_mail):
         user = User.objects.get(email = user_mail)
         user_details = user_details_serialize(user.details)
         if user_details.is_valid:
-            return user_details.data
-        else :
-            return user_details.error_messages
+            if user_details=={}:
+                print(f'get-user-det-val -> {user_details.data,'--',user_details}')
+                return {'message':'no-details'}
+            else:
+                print(f'12 get user {user_details.data}')
+                return user_details.data
+        else:
+            return user_details.errors
     
     except Exception as e:
-        return False
+        print(e, 'ye hai')
+        print(user_details_serialize.errors)
+        return {"error":str(e)}

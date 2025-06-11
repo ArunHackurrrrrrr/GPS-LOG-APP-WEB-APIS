@@ -3,13 +3,13 @@ from django.contrib.auth.models import User
 
 
 class user_Details(models.Model):
-    user = models.ForeignKey(User, on_delete= models.CASCADE, related_name='details')
+    user = models.OneToOneField(User, on_delete= models.CASCADE, related_name='details')
     is_company_admin = models.BooleanField(default=False)
     name = models.CharField(max_length=100,null=True,blank=True)
     gov_No = models.CharField(max_length=50,null=True,blank=True)
     address = models.CharField(max_length=50,null=True,blank=True)
     contact_No = models.CharField(max_length=10,null=True,blank=True)
-    role = models.CharField(max_length=10)
+    role = models.CharField(max_length=10, null=True,blank=True)
     created_at = models.DateTimeField(auto_now=True)
     updated_at = models.DateTimeField(auto_now=True)
 
