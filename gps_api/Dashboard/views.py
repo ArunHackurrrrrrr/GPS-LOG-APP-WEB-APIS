@@ -23,9 +23,10 @@ def add_User_Details(request):
         is_added = create_user_detials(user,user_Data)
         print(is_added == True)
         if is_added == True:
-            return Response({'message':'detail-allldded'}, status= status.HTTP_201_CREATED)
+            return Response({'message':'detail-added'}, status= status.HTTP_201_CREATED)
         else:
-            return Response({'message':is_added}, status= status.HTTP_406_NOT_ACCEPTABLE)
+            print('else 28',type(is_added))
+            return Response({'message':is_added}, status= status.HTTP_200_OK)
     except Exception as e:
         print(e)
         return Response(status= status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -38,7 +39,7 @@ def get_User_Details(request):
     print(f'user {user}')
     try:
         details = get_user_details(user)
-        if details['id'] == '':
+        if not details.get('id'):
             print('empty!')
             return Response({'message':'no-details'},status=status.HTTP_200_OK)
         else:

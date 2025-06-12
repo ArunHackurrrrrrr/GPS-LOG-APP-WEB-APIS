@@ -8,8 +8,12 @@ def create_user_detials(User, user_Data):
             serializer.save(user=User)  # ✅ pass user
             print(serializer)
             return True
-        print(serializer.errors)
-        return serializer.errors
+        print(serializer.errors,'msg')
+        for error, messages in serializer.errors.items():
+            print(error,'eerrr')
+            return error
+
+        # return serializer.errors
     except Exception as e:
         print(e)
         return {"error": str(e)}  # ✅ return string not raw exception
