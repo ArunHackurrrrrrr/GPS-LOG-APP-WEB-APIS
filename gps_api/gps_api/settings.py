@@ -140,3 +140,8 @@ SIMPLE_JWT = {
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
 }
+
+
+MEDIA_URL = '/profile-picture/'
+MEDIA_ROOT = BASE_DIR / 'profile-picture'
+

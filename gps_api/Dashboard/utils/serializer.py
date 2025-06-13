@@ -6,5 +6,13 @@ class user_details_serialize(serializers.ModelSerializer):
     
     class Meta:
         model = user_Details
-        exclude = ['user']
+        exclude = ['user','profile_Picture']
         # fields = ['_all_']
+
+
+
+class user_Picture_serialize(serializers.ModelSerializer):
+    
+    class Meta:
+        model = images
+        fields = ['profile_Picture']
