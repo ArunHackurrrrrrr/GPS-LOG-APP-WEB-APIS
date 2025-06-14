@@ -75,10 +75,12 @@ def get_User_Details(request):
             user_profile = images.objects.get(user = user)
             serializer = user_Picture_serialize(user_profile, context={"request": request})
             print('else views 77') # DATA IS GOING PERFECTLY USING BELOW , WE'VE TO MODIFY SOME DATA CLASS IN ANDROID APP
-            return Response({'details':details,'profile_url':serializer.data}, status= status.HTTP_200_OK)
+            combined_data = {**details,**serializer.data}
+            print(combined_data)
+            return Response(combined_data, status= status.HTTP_200_OK)
     except Exception as e:
         # print('this is else 45',details)
         print(e,'the except views 46')
-        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR) #FIX IT OTHER WISE IT'LL GIVE YOU SERVER ERROR CAUSE INFINITE LOADING OR APP CRASH
     
 
