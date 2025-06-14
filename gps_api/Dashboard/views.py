@@ -6,7 +6,8 @@ from rest_framework.decorators import api_view, permission_classes, parser_class
 from rest_framework.permissions import IsAuthenticated
 from Dashboard.utils.create_user_detail import create_user_detials , add_user_profile_picture
 from Dashboard.utils.get_user_details import get_user_details
-from Dashboard.models import user_Details
+from Dashboard.models import images
+from Dashboard.utils.serializer import user_Picture_serialize
 
 
 
@@ -15,7 +16,6 @@ from Dashboard.models import user_Details
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-# @parser_classes([MultiPartParser, FormParser])
 def add_User_Details(request):
     print(request.data)
     user = request.user
@@ -64,17 +64,18 @@ def user_profile_pic(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_User_Details(request):
-    # print('in get', request.data)
     user = request.user
-    # print(f'user {user}')
     try:
-        details = get_user_details(user)
+
+        details = get_user_details(user,request)
         if not details.get('id'):
             print('empty!')
             return Response({'message':'no-details'},status=status.HTTP_200_OK)
         else:
-            # print('else views 45')
-            return Response(details, status= status.HTTP_200_OK)
+            user_profile = images.objects.get(user = user)
+            serializer = user_Picture_serialize(user_profile, context={"request": request})
+            print('else views 77') # DATA IS GOING PERFECTLY USING BELOW , WE'VE TO MODIFY SOME DATA CLASS IN ANDROID APP
+            return Response({'details':details,'profile_url':serializer.data}, status= status.HTTP_200_OK)
     except Exception as e:
         # print('this is else 45',details)
         print(e,'the except views 46')
